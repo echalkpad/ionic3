@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, ItemSliding, ToastController, AlertController } from 'ionic-angular';
+import { reorderArray } from 'ionic-angular';
 
 @Component({
   selector: 'page-home',
@@ -7,11 +8,28 @@ import { NavController, ItemSliding, ToastController, AlertController } from 'io
 })
 export class HomePage {
   public users : any;
+  public usersTemp : any;
   public name : string;
   public fullname : string;
-  public exibir : boolean = false;
+  searchQuery: string = '';
+  public ordernar : boolean = false;
 
   constructor(public navCtrl: NavController, private toastCtrl: ToastController, private alertCtrl: AlertController) {
+    this.initializeItems();
+  }
+
+  onOrdernar(){
+    this.ordernar=!this.ordernar;
+  }
+
+  reorderItems(indexes) {
+    this.users = reorderArray(this.users, indexes);
+    //let element = this.users[indexes.from];
+    //this.users.splice(indexes.from, 1);
+    //this.users.splice(indexes.to, 0, element);
+  }
+
+  initializeItems(){
     this.users = [
       {
         id : 1,
@@ -29,10 +47,26 @@ export class HomePage {
         fullname : "Pedro Pedreira"
       }
     ];
+    this.usersTemp = this.users;
   }
 
-  onExibir(){
-    this.exibir = !this.exibir;
+  getItems(ev: any) {
+    // Reset items back to all of the items
+    this.users = this.usersTemp;
+
+    // set val to the value of the searchbar
+    let val = ev.target.value;
+
+    // if the value is an empty string don't filter the items
+    if (val && val.trim() != '') {
+      this.users = this.users.filter((item) => {
+        return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
+      })
+    }
+  }
+
+  onCancel(event : any){
+    this.users = this.usersTemp;
   }
 
   addUser(){
@@ -44,9 +78,14 @@ export class HomePage {
         name : this.name,
         fullname : this.fullname
       });
+    this.usersTemp = this.users;
     this.name='';
     this.fullname='';
     this.presentToast('Usuário adicionado com sucesso!');        
+  }
+
+  close(item:ItemSliding) {
+    item.close();
   }
 
   deleteItem(item:ItemSliding, user : any) {
@@ -69,6 +108,7 @@ export class HomePage {
             let pos = this.users.indexOf(user);
             console.log(pos);
             this.users.splice(pos,1);
+            this.usersTemp = this.users;
             alert.dismiss(()=>{
               this.presentToast('Usuário excluído com sucesso!');        
             });
@@ -83,7 +123,7 @@ export class HomePage {
     let toast = this.toastCtrl.create({
       message: message,
       duration: 3000,
-      position: 'top'
+      position: 'bottom'
     });
     toast.present();
   }

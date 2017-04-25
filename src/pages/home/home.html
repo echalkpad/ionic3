@@ -7,14 +7,29 @@
     </ion-buttons>
     <ion-title>Whats Snaps Grams</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only>
-        <ion-icon name="more"></ion-icon>
+      <button ion-button icon-only (click)="buscar=!buscar">
+        <ion-icon [name]="!buscar?'search':'close'"></ion-icon>
+      </button>
+      <button ion-button icon-only (click)="onOrdernar()">
+        <ion-icon [name]="!ordernar?'reorder':'close'"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content no-padding>
+  <ion-searchbar 
+  [animated]="true"
+  [showCancelButton]="false" 
+  [cancelButtonText]="Cancelar" 
+  placeholder="Buscar contato..."
+  color="light"  
+  *ngIf="buscar" 
+  (input)="getItems($event)" 
+  (ionCancel)="onCancel($event);buscar=false"
+  (ionClear)="onCancel($event);buscar=false">
+  </ion-searchbar>
+
   <ion-list *ngIf="exibir">
     <ion-item>
       <ion-label floating color="primary">Apelido</ion-label>
@@ -24,39 +39,43 @@
       <ion-label floating color="primary">Nome Completo</ion-label>
       <ion-input type="text" [(ngModel)]="fullname"></ion-input>
     </ion-item>
-    <button [disabled]="!name || !fullname " ion-button color="secondary" full round item-left (click)="addUser()">
+    <button [disabled]="!name || !fullname " ion-button color="secondary" block round item-left (click)="addUser()">
       <ion-icon name="add"></ion-icon>
       Adicionar
     </button>
   </ion-list>
-  
-  <ion-list>
+ 
+  <ion-list >
     <ion-list-header>
     Contatos
     </ion-list-header>
-    <ion-item-sliding #slidingItem *ngFor="let user of users">
-      <ion-item>
-        <ion-icon name="people" item-left></ion-icon>
-        {{user.name}}
-        <p>{{user.fullname}}</p>
-        <ion-badge item-right>{{user.id}}</ion-badge>
-      </ion-item>
-      <ion-item-options side="left">
-        <button ion-button color="light">
-          <ion-icon name="archive"></ion-icon>
-          Arquivar
-        </button>
-        <button ion-button color="secondary">
-          <ion-icon name="call"></ion-icon>
-          Ligar
-        </button>
-      </ion-item-options>
-      <ion-item-options side="right" (ionSwipe)="deleteItem(slidingItem, user)">
-        <button ion-button color="danger" expandable (click)="deleteItem(slidingItem, user)">
-          <ion-icon name="trash"></ion-icon>
-          Apagar
-        </button>
-      </ion-item-options>
-    </ion-item-sliding>
+    <ion-item-group [reorder]="ordernar" (ionItemReorder)="reorderItems($event)">
+      <ion-item-sliding #slidingItem *ngFor="let user of users">
+        <ion-item>
+          <ion-avatar item-left>
+            <img src="http://lorempixel.com/200/200/animals/">
+          </ion-avatar>
+          {{user.name}}
+          <p>{{user.fullname}}</p>
+          <ion-badge item-right>{{user.id}}</ion-badge>
+        </ion-item>
+        <ion-item-options side="left">
+          <button ion-button color="light" (click)="close(slidingItem)">
+            <ion-icon name="archive"></ion-icon>
+            Arquivar
+          </button>
+          <button ion-button color="secondary" (click)="close(slidingItem)">
+            <ion-icon name="call"></ion-icon>
+            Ligar
+          </button>
+        </ion-item-options>
+        <ion-item-options side="right" (ionSwipe)="deleteItem(slidingItem, user)">
+          <button ion-button color="danger" expandable (click)="deleteItem(slidingItem, user)">
+            <ion-icon name="trash"></ion-icon>
+            Apagar
+          </button>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-item-group>
   </ion-list>
 </ion-content>

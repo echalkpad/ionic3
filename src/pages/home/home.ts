@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { NavController, ItemSliding, ToastController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, ItemSliding, ToastController, AlertController } from 'ionic-angular';
 import { reorderArray } from 'ionic-angular';
 
+@IonicPage()
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
+export class Home {
   public users : any;
   public usersTemp : any;
   public name : string;

@@ -6,7 +6,6 @@ import { StatusBar } from '@ionic-native/status-bar';
   templateUrl: 'app.html'
 })
 export class MyApp {
-  //rootPage:any = TabsPage;
   rootPage:string = 'Tabs';
 
   constructor(platform: Platform, statusBar: StatusBar) {

@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-navbar color="secondary">
+    <ion-buttons start>
+      <button ion-button icon-only (click)="exibir=!exibir">
+        <ion-icon [name]="!exibir?'add':'close'"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>Whats Snaps Grams</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-list *ngIf="exibir">
+    <ion-item>
+      <ion-label floating color="primary">Apelido</ion-label>
+      <ion-input type="text" [(ngModel)]="name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating color="primary">Nome Completo</ion-label>
+      <ion-input type="text" [(ngModel)]="fullname"></ion-input>
+    </ion-item>
+    <button [disabled]="!name || !fullname " ion-button color="secondary" full round item-left (click)="addUser()">
+      <ion-icon name="add"></ion-icon>
+      Adicionar
+    </button>
+  </ion-list>
+  
+  <ion-list>
+    <ion-list-header>
+    Contatos
+    </ion-list-header>
+    <ion-item-sliding #slidingItem *ngFor="let user of users">
+      <ion-item>
+        <ion-icon name="people" item-left></ion-icon>
+        {{user.name}}
+        <p>{{user.fullname}}</p>
+        <ion-badge item-right>{{user.id}}</ion-badge>
+      </ion-item>
+      <ion-item-options side="left">
+        <button ion-button color="light">
+          <ion-icon name="archive"></ion-icon>
+          Arquivar
+        </button>
+        <button ion-button color="secondary">
+          <ion-icon name="call"></ion-icon>
+          Ligar
+        </button>
+      </ion-item-options>
+      <ion-item-options side="right" (ionSwipe)="deleteItem(slidingItem, user)">
+        <button ion-button color="danger" expandable (click)="deleteItem(slidingItem, user)">
+          <ion-icon name="trash"></ion-icon>
+          Apagar
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

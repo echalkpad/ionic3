@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 
+import { UserService } from '../providers/user-service';
+
 import { StatusBar } from '@ionic-native/status-bar';
 
 @NgModule({
@@ -19,6 +21,7 @@ import { StatusBar } from '@ionic-native/status-bar';
   ],
   providers: [
     StatusBar,
+    UserService,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })

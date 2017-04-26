@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, ItemSliding, ToastController, AlertController } from 'ionic-angular';
 import { reorderArray } from 'ionic-angular';
+import { UserService } from '../../providers/user-service';
+import { User } from "../../models/user.model";
 
 @IonicPage()
 @Component({
@@ -8,15 +10,125 @@ import { reorderArray } from 'ionic-angular';
   templateUrl: 'home.html'
 })
 export class Home {
-  public users : any;
-  public usersTemp : any;
-  public name : string;
-  public fullname : string;
+  public users : User[] = [];
+  public usersTemp : User[] = [];
+  public arquivados : User[] = [];
   searchQuery: string = '';
   public ordernar : boolean = false;
 
-  constructor(public navCtrl: NavController, private toastCtrl: ToastController, private alertCtrl: AlertController) {
-    this.initializeItems();
+  constructor(
+    public navCtrl: NavController,
+    private toastCtrl: ToastController, 
+    private alertCtrl: AlertController, 
+    private userService : UserService) 
+    {
+      this.loadUsers();
+  }
+
+  loadUsers() {
+    this.userService.getUsers().then(data => {
+      if (data) {
+          this.users = data.filter((item) => {
+            return (item.arquived == false);
+          });
+          this.usersTemp = this.users;
+          this.arquivados = data.filter((item) => {
+            return (item.arquived == true);
+          });
+        }
+      });
+  }
+
+  newUser(){
+    let alert = this.alertCtrl.create({
+      title: 'Novo Usuário',
+      inputs: [
+        {
+          name: 'name',
+          placeholder: 'Apelido'
+        },
+        {
+          name: 'fullname',
+          placeholder: 'Nome Completo'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Salvar',
+          handler: (data) => {
+            alert.dismiss().then(()=>{
+              if(data){
+                this.addUser(data.name, data.fullname);
+              }
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  addUser(name : string, fullname : string){
+    let user = {
+      name : name,
+      fullname : fullname
+    };
+    this.userService.addUser(user).then(data =>{
+      if (data) {
+        this.loadUsers();
+        this.presentToast('Usuário adicionado com sucesso!');        
+      }
+    }); 
+  }
+
+  editUser(item:ItemSliding, user : any){
+    item.close();
+
+    let alert = this.alertCtrl.create({
+      title: 'Editar Usuário',
+      inputs: [
+        {
+          name: 'name',
+          value: user.name,
+          placeholder: 'Apelido'
+        },
+        {
+          name: 'fullname',
+          value : user.fullname,
+          placeholder: 'Nome Completo'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Salvar',
+          handler: (data) => {
+            alert.dismiss().then(()=>{
+              if(data){
+                this.userService.editUser(user, data).then(data=>{
+                  this.loadUsers();
+                  this.presentToast('Usuário editado com sucesso!');        
+                });
+              }
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
   onOrdernar(){
@@ -30,27 +142,6 @@ export class Home {
     //this.users.splice(indexes.to, 0, element);
   }
 
-  initializeItems(){
-    this.users = [
-      {
-        id : 1,
-        name: "Carlos",
-        fullname: "Carlos Augusto Fávero"
-      },
-      {
-        id : 2,
-        name: "João",
-        fullname : "João da Silva"
-      },
-      {
-        id : 3,
-        name: "Pedro",
-        fullname : "Pedro Pedreira"
-      }
-    ];
-    this.usersTemp = this.users;
-  }
-
   getItems(ev: any) {
     // Reset items back to all of the items
     this.users = this.usersTemp;
@@ -62,27 +153,12 @@ export class Home {
     if (val && val.trim() != '') {
       this.users = this.users.filter((item) => {
         return (item.name.toLowerCase().indexOf(val.toLowerCase()) > -1);
-      })
+      });
     }
   }
 
   onCancel(event : any){
     this.users = this.usersTemp;
-  }
-
-  addUser(){
-    let last = this.users.slice(-1)[0];
-    let newId = last.id+1;
-    this.users.push(
-      {
-        id: newId,
-        name : this.name,
-        fullname : this.fullname
-      });
-    this.usersTemp = this.users;
-    this.name='';
-    this.fullname='';
-    this.presentToast('Usuário adicionado com sucesso!');        
   }
 
   close(item:ItemSliding) {
@@ -106,12 +182,45 @@ export class Home {
         {
           text: 'Excluir',
           handler: () => {
-            let pos = this.users.indexOf(user);
-            console.log(pos);
-            this.users.splice(pos,1);
-            this.usersTemp = this.users;
-            alert.dismiss(()=>{
-              this.presentToast('Usuário excluído com sucesso!');        
+            alert.dismiss().then(()=>{
+              this.userService.removeUser(user).then(data=>{
+                if (data) {
+                  this.loadUsers();
+                  this.presentToast('Usuário excluído com sucesso!');        
+                }
+              });
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  arquivarUser(item:ItemSliding, user : any) {
+    item.close();
+
+    let alert = this.alertCtrl.create({
+      title: user.arquived == false ? 'Arquivar usuário?' : 'Restaurar usuário?',
+      subTitle: `Deseja realmente ${user.arquived == false ? 'arquivar':'restaurar'} o usuário ${user.name}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: data => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: user.arquived == false ? 'Arquivar' : 'Restaurar',
+          handler: () => {
+            alert.dismiss().then(()=>{
+              this.userService.arquivarUser(user).then(data=>{
+                if (data) {
+                  this.loadUsers();
+                  this.presentToast(user.arquived == true ? 'Usuário arquivado com sucesso!' : 'Usuário restaurado com sucesso!');        
+                }
+              });
             });
           }
         }

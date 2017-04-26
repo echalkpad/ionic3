@@ -1,14 +1,14 @@
 <ion-header>
   <ion-navbar color="secondary">
     <ion-buttons start>
-      <button ion-button icon-only (click)="exibir=!exibir">
-        <ion-icon [name]="!exibir?'add':'close'"></ion-icon>
+      <button ion-button icon-only (click)="newUser()">
+        <ion-icon name="person-add"></ion-icon>
       </button>
     </ion-buttons>
     <ion-title>Whats Snaps Grams</ion-title>
     <ion-buttons end>
       <button ion-button icon-only (click)="buscar=!buscar">
-        <ion-icon [name]="!buscar?'search':'close'"></ion-icon>
+        <ion-icon name="search"></ion-icon>
       </button>
       <button ion-button icon-only (click)="onOrdernar()">
         <ion-icon [name]="!ordernar?'reorder':'close'"></ion-icon>
@@ -30,43 +30,28 @@
   (ionClear)="onCancel($event);buscar=false">
   </ion-searchbar>
 
-  <ion-list *ngIf="exibir">
-    <ion-item>
-      <ion-label floating color="primary">Apelido</ion-label>
-      <ion-input type="text" [(ngModel)]="name"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label floating color="primary">Nome Completo</ion-label>
-      <ion-input type="text" [(ngModel)]="fullname"></ion-input>
-    </ion-item>
-    <button [disabled]="!name || !fullname " ion-button color="secondary" block round item-left (click)="addUser()">
-      <ion-icon name="add"></ion-icon>
-      Adicionar
-    </button>
-  </ion-list>
- 
-  <ion-list >
+  <ion-list *ngIf="arquivados.length!=0">
     <ion-list-header>
-    Contatos
+      Arquivados
     </ion-list-header>
     <ion-item-group [reorder]="ordernar" (ionItemReorder)="reorderItems($event)">
-      <ion-item-sliding #slidingItem *ngFor="let user of users">
+      <ion-item-sliding #slidingItem *ngFor="let user of arquivados">
         <ion-item>
           <ion-avatar item-left>
-            <img src="http://lorempixel.com/200/200/animals/">
+            <img [src]="user.avatar">
           </ion-avatar>
           {{user.name}}
           <p>{{user.fullname}}</p>
           <ion-badge item-right>{{user.id}}</ion-badge>
         </ion-item>
-        <ion-item-options side="left">
-          <button ion-button color="light" (click)="close(slidingItem)">
+        <ion-item-options side="left" (ionSwipe)="arquivarUser(slidingItem, user)">
+          <button ion-button color="light" expandable (click)="arquivarUser(slidingItem, user)">
             <ion-icon name="archive"></ion-icon>
-            Arquivar
+            Restaurar
           </button>
-          <button ion-button color="secondary" (click)="close(slidingItem)">
-            <ion-icon name="call"></ion-icon>
-            Ligar
+          <button ion-button color="primary" (click)="editUser(slidingItem, user)">
+            <ion-icon name="create"></ion-icon>
+            Editar
           </button>
         </ion-item-options>
         <ion-item-options side="right" (ionSwipe)="deleteItem(slidingItem, user)">
@@ -78,4 +63,39 @@
       </ion-item-sliding>
     </ion-item-group>
   </ion-list>
+
+  <ion-list *ngIf="users.length!=0">
+    <ion-list-header>
+    Contatos
+    </ion-list-header>
+    <ion-item-group [reorder]="ordernar" (ionItemReorder)="reorderItems($event)">
+      <ion-item-sliding #slidingItem *ngFor="let user of users">
+        <ion-item>
+          <ion-avatar item-left>
+            <img [src]="user.avatar">
+          </ion-avatar>
+          {{user.name}}
+          <p>{{user.fullname}}</p>
+          <ion-badge item-right>{{user.id}}</ion-badge>
+        </ion-item>
+        <ion-item-options side="left" (ionSwipe)="arquivarUser(slidingItem, user)">
+          <button ion-button color="light" expandable (click)="arquivarUser(slidingItem, user)">
+            <ion-icon name="archive"></ion-icon>
+            Arquivar
+          </button>
+          <button ion-button color="primary" (click)="editUser(slidingItem, user)">
+            <ion-icon name="create"></ion-icon>
+            Editar
+          </button>
+        </ion-item-options>
+        <ion-item-options side="right" (ionSwipe)="deleteItem(slidingItem, user)">
+          <button ion-button color="danger" expandable (click)="deleteItem(slidingItem, user)">
+            <ion-icon name="trash"></ion-icon>
+            Apagar
+          </button>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-item-group>
+  </ion-list>
+
 </ion-content>

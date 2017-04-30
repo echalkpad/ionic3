@@ -63,11 +63,11 @@ export class Home {
         {
           text: 'Salvar',
           handler: (data) => {
-            alert.dismiss().then(()=>{
+            //alert.dismiss().then(()=>{
               if(data){
                 this.addUser(data.name, data.fullname);
               }
-            });
+            //});
           }
         }
       ]
@@ -116,14 +116,14 @@ export class Home {
         {
           text: 'Salvar',
           handler: (data) => {
-            alert.dismiss().then(()=>{
+            //alert.dismiss().then(()=>{
               if(data){
                 this.userService.editUser(user, data).then(data=>{
                   this.loadUsers();
                   this.presentToast('Usuário editado com sucesso!');        
                 });
               }
-            });
+            //});
           }
         }
       ]
@@ -182,14 +182,14 @@ export class Home {
         {
           text: 'Excluir',
           handler: () => {
-            alert.dismiss().then(()=>{
+            //alert.dismiss().then(()=>{
               this.userService.removeUser(user).then(data=>{
                 if (data) {
                   this.loadUsers();
                   this.presentToast('Usuário excluído com sucesso!');        
                 }
               });
-            });
+            //});
           }
         }
       ]
@@ -214,14 +214,14 @@ export class Home {
         {
           text: user.arquived == false ? 'Arquivar' : 'Restaurar',
           handler: () => {
-            alert.dismiss().then(()=>{
+            //alert.dismiss().then(()=>{
               this.userService.arquivarUser(user).then(data=>{
                 if (data) {
                   this.loadUsers();
                   this.presentToast(user.arquived == true ? 'Usuário arquivado com sucesso!' : 'Usuário restaurado com sucesso!');        
                 }
               });
-            });
+            //});
           }
         }
       ]

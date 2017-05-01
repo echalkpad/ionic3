@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+
 import { IonicPage, NavController, ItemSliding, ToastController, AlertController } from 'ionic-angular';
 import { reorderArray } from 'ionic-angular';
 import { UserService } from '../../providers/user-service';
@@ -15,6 +16,7 @@ export class Home {
   public arquivados : User[] = [];
   searchQuery: string = '';
   public ordernar : boolean = false;
+  public buscar : boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -23,6 +25,10 @@ export class Home {
     private userService : UserService) 
     {
       this.loadUsers();
+  }
+
+  onSearch() {
+    this.buscar = !this.buscar;
   }
 
   loadUsers() {

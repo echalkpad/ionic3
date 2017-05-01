@@ -5,11 +5,11 @@ import { IonicPage } from 'ionic-angular';
 @Component({
   templateUrl: 'tabs.html'
 })
-export class Tabs {
+export class TabsPage {
 
-  tab1Root = "Home";
-  tab2Root = "About";
-  tab3Root = "Contact";
+  tab1Root:string = "Home";
+  tab2Root:string = "About";
+  tab3Root:string = "Contact";
 
   constructor() {
 
